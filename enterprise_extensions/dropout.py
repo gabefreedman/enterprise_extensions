@@ -48,6 +48,52 @@ def dropout_powerlaw(f, name, log10_A=-16, gamma=5,
 
 
 @signal_base.function
+def dropout_monopole_orf(pos1, pos2, psrname1=None, psrname2=None,
+                   dropout_psr='B1855+09', k_drop=0.5, k_threshold=0.5):
+    """
+    Dropout monopole overlap reduction function. The ORF is switched on
+    or off for all cross terms involving a single pulsar `dropout_psr` depending
+    on whether k_drop exceeds a value k_threshold.
+    """
+
+    if np.all(pos1 == pos2):
+        return 1 + 1e-5
+    else:
+        if dropout_psr in [psrname1, psrname2]:
+            if k_drop >= k_threshold:
+                k_switch = 1.0
+            elif k_drop < k_threshold:
+                k_switch = 0.0
+            
+            return k_switch * 1.0
+        else:
+            return 1.0
+
+
+@signal_base.function
+def dropout_dipole_orf(pos1, pos2, psrname1=None, psrname2=None,
+                   dropout_psr='B1855+09', k_drop=0.5, k_threshold=0.5):
+    """
+    Dropout dipole overlap reduction function. The ORF is switched on
+    or off for all cross terms involving a single pulsar `dropout_psr` depending
+    on whether k_drop exceeds a value k_threshold.
+    """
+
+    if np.all(pos1 == pos2):
+        return 1 + 1e-5
+    else:
+        if dropout_psr in [psrname1, psrname2]:
+            if k_drop >= k_threshold:
+                k_switch = 1.0
+            elif k_drop < k_threshold:
+                k_switch = 0.0
+            
+            return k_switch * np.dot(pos1, pos2)
+        else:
+            return np.dot(pos1, pos2)
+
+
+@signal_base.function
 def dropout_hd_orf(pos1, pos2, psrname1=None, psrname2=None,
                    dropout_psr='B1855+09', k_drop=0.5, k_threshold=0.5):
     """
